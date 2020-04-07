@@ -1,0 +1,317 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled3.ipynb",
+      "provenance": [],
+      "collapsed_sections": [],
+      "authorship_tag": "ABX9TyNePyCMbfYL8385JDzvjMGq",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Amanzholbio/Yessenov-data/blob/master/Yessenov%20solution\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "-uVPU4nrF1Tb",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 894
+        },
+        "outputId": "d518c832-a7c0-4cbf-ff1b-2ab827cb1efd"
+      },
+      "source": [
+        "%matplotlib inline \n",
+        "import matplotlib as mpl \n",
+        "import seaborn as sns \n",
+        "import matplotlib.pyplot as plt \n",
+        "import statsmodels.formula.api as smf \n",
+        "import statsmodels.graphics.api as smg \n",
+        "import pandas as pd \n",
+        "import numpy as np \n",
+        "import patsy \n",
+        "from statsmodels.graphics.correlation import plot_corr \n",
+        "from sklearn.model_selection import train_test_split \n",
+        "plt.style.use('seaborn') \n",
+        "\n",
+        "rawBostonData = pd.read_csv('https://raw.githubusercontent.com/Amanzholbio/Yessenov-data/master/3D9IBWZA_train.csv')\n",
+        "rawBostonData.head()\n",
+        "rawBostonData = rawBostonData.dropna()\n",
+        "rawBostonData = rawBostonData.drop_duplicates()\n",
+        "\n",
+        "\n",
+        "X = rawBostonData.drop('f', axis = 1)\n",
+        "y = rawBostonData[['f']]\n",
+        "seed = 10\n",
+        "test_data_size = 0.3\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_data_size, random_state = seed)\n",
+        "train_data = pd.concat([X_train, y_train], axis = 1)\n",
+        "test_data = pd.concat([X_test, y_test], axis = 1)\n",
+        "\n",
+        "multiLinearModel = smf.ols(formula=\\\n",
+        "'f ~ x1 + x2 + x3 + x4 + x5', data=train_data)\n",
+        "\n",
+        "multiLinearModResult = multiLinearModel.fit()\n",
+        "print(multiLinearModResult.summary())\n",
+        "\n",
+        "X_actualtest = pd.read_csv('https://raw.githubusercontent.com/Amanzholbio/Yessenov-data/master/3D9IBWZA_test.csv')\n",
+        "\n",
+        "y_pred = multiLinearModel.predict(X_actualtest)\n",
+        "\n",
+        "print(y_pred)\n",
+        "\n"
+      ],
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "                            OLS Regression Results                            \n",
+            "==============================================================================\n",
+            "Dep. Variable:                      f   R-squared:                       0.763\n",
+            "Model:                            OLS   Adj. R-squared:                  0.745\n",
+            "Method:                 Least Squares   F-statistic:                     41.30\n",
+            "Date:                Tue, 07 Apr 2020   Prob (F-statistic):           9.05e-19\n",
+            "Time:                        10:28:01   Log-Likelihood:                -793.37\n",
+            "No. Observations:                  70   AIC:                             1599.\n",
+            "Df Residuals:                      64   BIC:                             1612.\n",
+            "Df Model:                           5                                         \n",
+            "Covariance Type:            nonrobust                                         \n",
+            "==============================================================================\n",
+            "                 coef    std err          t      P>|t|      [0.025      0.975]\n",
+            "------------------------------------------------------------------------------\n",
+            "Intercept  -4.188e+04   1.11e+04     -3.781      0.000    -6.4e+04   -1.98e+04\n",
+            "x1           -41.9322     30.705     -1.366      0.177    -103.273      19.408\n",
+            "x2           550.2162     56.840      9.680      0.000     436.665     663.768\n",
+            "x3          -203.7830     88.122     -2.313      0.024    -379.826     -27.740\n",
+            "x4          7454.3352    930.179      8.014      0.000    5596.089    9312.581\n",
+            "x5           256.2622     42.512      6.028      0.000     171.334     341.190\n",
+            "==============================================================================\n",
+            "Omnibus:                       32.229   Durbin-Watson:                   1.718\n",
+            "Prob(Omnibus):                  0.000   Jarque-Bera (JB):               79.502\n",
+            "Skew:                           1.470   Prob(JB):                     5.45e-18\n",
+            "Kurtosis:                       7.315   Cond. No.                         945.\n",
+            "==============================================================================\n",
+            "\n",
+            "Warnings:\n",
+            "[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.\n"
+          ],
+          "name": "stdout"
+        },
+        {
+          "output_type": "error",
+          "ename": "ValueError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mValueError\u001b[0m                                Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-9-7a95fc0fef8a>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     33\u001b[0m \u001b[0mX_actualtest\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread_csv\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'https://raw.githubusercontent.com/Amanzholbio/Yessenov-data/master/3D9IBWZA_test.csv'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     34\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 35\u001b[0;31m \u001b[0my_pred\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmultiLinearModel\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mpredict\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX_actualtest\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     36\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     37\u001b[0m \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0my_pred\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/local/lib/python3.6/dist-packages/statsmodels/regression/linear_model.py\u001b[0m in \u001b[0;36mpredict\u001b[0;34m(self, params, exog)\u001b[0m\n\u001b[1;32m    362\u001b[0m             \u001b[0mexog\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mexog\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    363\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 364\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mexog\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mparams\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    365\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    366\u001b[0m     \u001b[0;32mdef\u001b[0m \u001b[0mget_distribution\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mparams\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mscale\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mexog\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mNone\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdist_class\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mNone\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m<__array_function__ internals>\u001b[0m in \u001b[0;36mdot\u001b[0;34m(*args, **kwargs)\u001b[0m\n",
+            "\u001b[0;31mValueError\u001b[0m: shapes (70,6) and (20,5) not aligned: 6 (dim 1) != 20 (dim 0)"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "colab_type": "code",
+        "outputId": "0f0eee27-1124-49a6-9c8e-4602a99396dd",
+        "id": "MQHR54VOOMVM",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 381
+        }
+      },
+      "source": [
+        "import pandas as pd  \n",
+        "import numpy as np  \n",
+        "import matplotlib.pyplot as plt  \n",
+        "import seaborn as seabornInstance \n",
+        "import statsmodels.formula.api as smf\n",
+        "from sklearn.model_selection import train_test_split \n",
+        "from sklearn.linear_model import LinearRegression\n",
+        "from sklearn import metrics\n",
+        "%matplotlib inline\n",
+        "\n",
+        "dataset = pd.read_csv('https://raw.githubusercontent.com/Amanzholbio/Yessenov-data/master/3D9IBWZA_train.csv')\n",
+        "\n",
+        "dataset = dataset.dropna()\n",
+        "dataset = dataset.drop_duplicates()\n",
+        "\n",
+        "#X = dataset[['x1', 'x2', 'x3', 'x4', 'x5']].values\n",
+        "#y = dataset['f'].values\n",
+        "\n",
+        "X = dataset.drop('f', axis = 1) \n",
+        "y = dataset[['f']] \n",
+        "\n",
+        "\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1 , random_state= 0)\n",
+        "train_data = pd.concat([X_train, y_train], axis = 1) \n",
+        "test_data = pd.concat([X_test, y_test], axis = 1) \n",
+        " \n",
+        "\n",
+        "multiLogLinMod  = smf.ols(formula='f ~ x1 + x2 + x3 + x4 + x5', data=train_data)\n",
+        "#multiLogLinMod  = LinearRegression(formula='f ~ x1 + x2 + x3 + x4 + x5', data=train_data)\n",
+        "\n",
+        "#multiLogLinModResult = multiLogLinMod.fit()\n",
+        "\n",
+        "#print(multiLogLinMod.summary())\n",
+        "\n",
+        "#y_pred = regressor2.predict(X_test)\n",
+        "#df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})\n",
+        "\n",
+        "#df\n",
+        "\n",
+        "#df1 = df.head(25)\n",
+        "#df1.plot(kind='bar',figsize=(10,8))\n",
+        "#plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')\n",
+        "#plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')\n",
+        "#plt.show()\n",
+        "\n",
+        "#print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  \n",
+        "#print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))  \n",
+        "#print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred))) \n",
+        "\n",
+        "testset = pd.read_csv('https://raw.githubusercontent.com/Amanzholbio/Yessenov-data/master/3D9IBWZA_test.csv')\n",
+        "\n",
+        "#y_pred = multiLogLinModResult.predict(testset)\n",
+        "y_pred = multiLogLinModResult.predict(testset)\n",
+        "\n",
+        "print(y_pred)"
+      ],
+      "execution_count": 25,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "0     10.833301\n",
+            "1     10.323753\n",
+            "2     10.624741\n",
+            "3      8.377599\n",
+            "4      8.363191\n",
+            "5     10.044061\n",
+            "6      9.649075\n",
+            "7      8.612496\n",
+            "8      9.975655\n",
+            "9      9.475069\n",
+            "10     9.263303\n",
+            "11    11.713991\n",
+            "12     8.471501\n",
+            "13    11.227311\n",
+            "14     9.718952\n",
+            "15     9.352371\n",
+            "16     8.820164\n",
+            "17    10.867423\n",
+            "18     8.677377\n",
+            "19     9.047469\n",
+            "dtype: float64\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "2x4PLGKim9LR",
+        "colab_type": "code",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 35
+        },
+        "outputId": "913b9173-bd38-4171-af58-1def75b1e811"
+      },
+      "source": [
+        "import pandas as pd  \n",
+        "import numpy as np  \n",
+        "import matplotlib.pyplot as plt  \n",
+        "import seaborn as seabornInstance \n",
+        "import statsmodels.formula.api as smf\n",
+        "from sklearn.model_selection import train_test_split \n",
+        "from sklearn.linear_model import LinearRegression\n",
+        "from sklearn import metrics\n",
+        "%matplotlib inline\n",
+        "\n",
+        "dataset = pd.read_csv('https://raw.githubusercontent.com/Amanzholbio/Yessenov-data/master/3D9IBWZA_train.csv')\n",
+        "\n",
+        "dataset = dataset.dropna()\n",
+        "dataset = dataset.drop_duplicates()\n",
+        "\n",
+        "#X = dataset[['x1', 'x2', 'x3', 'x4', 'x5']].values\n",
+        "#y = dataset['f'].values\n",
+        "\n",
+        "X = dataset.drop('f', axis = 1) \n",
+        "y = dataset[['f']] \n",
+        "\n",
+        "\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1 , random_state= 0)\n",
+        "train_data = pd.concat([X_train, y_train], axis = 1) \n",
+        "test_data = pd.concat([X_test, y_test], axis = 1) \n",
+        " \n",
+        "\n",
+        "multiLogLinMod  = smf.ols(formula='np.log(f) ~ (x1 + x2 + x3 + x4 + x5)**2', data=train_data)\n",
+        "#multiLogLinMod  = LinearRegression(formula='f ~ x1 + x2 + x3 + x4 + x5', data=train_data)\n",
+        "\n",
+        "multiLogLinModResult = multiLogLinMod.fit()\n",
+        "\n",
+        "#print(multiLogLinMod.summary())\n",
+        "\n",
+        "#y_pred = regressor2.predict(X_test)\n",
+        "#df = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})\n",
+        "\n",
+        "#df\n",
+        "\n",
+        "#df1 = df.head(25)\n",
+        "#df1.plot(kind='bar',figsize=(10,8))\n",
+        "#plt.grid(which='major', linestyle='-', linewidth='0.5', color='green')\n",
+        "#plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')\n",
+        "#plt.show()\n",
+        "\n",
+        "#print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))  \n",
+        "#print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))  \n",
+        "#print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred))) \n",
+        "\n",
+        "testset = pd.read_csv('https://raw.githubusercontent.com/Amanzholbio/Yessenov-data/master/3D9IBWZA_test.csv')\n",
+        "\n",
+        "#y_pred = multiLogLinModResult.predict(testset)\n",
+        "y_pred = multiLogLinModResult.predict(testset)\n",
+        "\n",
+        "for n in y_pred:\n",
+        "  x = np.exp(n)\n",
+        "  y = ','\n",
+        "  print(str(int(x)),end = ',')\n",
+        "  \n",
+        "  \n",
+        "  "
+      ],
+      "execution_count": 47,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "49160,24898,23800,6032,4895,32196,12855,6959,51654,13175,9719,134569,5160,61984,10987,9498,9454,44986,4936,9646,"
+          ],
+          "name": "stdout"
+        }
+      ]
+    }
+  ]
+}
